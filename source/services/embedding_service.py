@@ -2,14 +2,13 @@ import os
 from google import genai
 from google.genai import types
 # from sentence_transformers import SentenceTransformer
-from dotenv import load_dotenv
+from source.utils.config import Config
 class EmbeddingService:
     def __init__(self, use_gemini=False, model_name=None):
-        load_dotenv()
         self.use_gemini = use_gemini
         self.client=None
         if use_gemini:
-            client = genai.Client(api_key="AIzaSyDivK7EMR5Z8qGLVNJaCVUPHDFZUC2kh-8")
+            client = genai.Client(api_key=Config.GEMINI_API_KEY)
             
             self.client=client
             
