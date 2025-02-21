@@ -14,3 +14,4 @@ class QueryResult:
     snippet: str
     score: float # Similarity score from Weaviate
     metadata: dict
+    chunk_order_key:int

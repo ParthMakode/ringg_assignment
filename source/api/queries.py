@@ -19,7 +19,9 @@ def register_routes(app):
         document_service = DocumentService(embedding_service, weaviate_service, config)
 
         try:
+            print("going to query")
             results = document_service.query_document(document_id, query_text)
             return jsonify([r.__dict__ for r in results]), 200
         except Exception as e:
+            print(e)
             return jsonify({'error': str(e)}), 500

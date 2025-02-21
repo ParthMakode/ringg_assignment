@@ -18,19 +18,24 @@ class DocumentService:
         )
 
 
-    def process_and_index_document(self, file_path: str, file_name:str, content_type: str, metadata: dict = None) -> str:
+    def process_and_index_document(self, file_path: str, file_name:str, content_type: str, metadata: dict = None,oldid:str=None) -> str:
         """Reads, parses, chunks, embeds, and indexes a document."""
         try:
             print("file path ",file_path)
             file_content = read_and_parse_file(file_path, content_type)
         except Exception as e:
+            print(f"Error Processing file: {e}")
             raise ValueError(f"Error Processing file: {e}")
 
         # Generate a unique ID for the document
+        print("oldid ",oldid)
         document_id = str(uuid.uuid4())
+        if(oldid is not None):
+            document_id=oldid
         print("id generated")
         document = Document(id=document_id, filename=file_name, content=file_content, content_type=content_type, metadata=metadata or {})
         print("chunking")
+        
         if content_type != "application/json": # Chunk all except json.
             chunks = self.text_splitter.split_text(file_content)
             document.content = chunks
@@ -46,7 +51,8 @@ class DocumentService:
     def update_document(self, document_id: str, file_path: str, file_name:str, content_type: str, metadata: dict = None) -> str:
         """Deletes the old document and indexes the new one."""
         self.delete_document(document_id)
-        return self.process_and_index_document(file_path, file_name, content_type, metadata)
+        print("deleted document id ",document_id,"\nrenewing new document with ",document_id,"\n",file_path)
+        return self.process_and_index_document(file_path, file_name, content_type, metadata,oldid=document_id)
 
 
     def delete_document(self, document_id: str):

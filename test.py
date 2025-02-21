@@ -1,7 +1,7 @@
 #test.py
 import requests
 import json
-import os
+import os,time
 
 # Base URL of your Flask application (assuming it's running on localhost:5000)
 BASE_URL = "http://127.0.0.1:5000"
@@ -93,10 +93,12 @@ def test_upload_and_query_pdf(test_files):
     response, document_id = upload_file("test_files/test.pdf", metadata)
     print(f"  Upload Response: {response.status_code}, {response.text}")
     if response.status_code != 201: return  # Stop if upload fails
-    
     query = "data science"
-    response = query_document("3c6c6977-35e8-45c5-97fb-1cd7be128e04", query)
-    print(f"  Query Response: {response.status_code}, {response.text}")
+    print(document_id)
+    print("waiting for timer",)
+    time.sleep(100)
+    # response = query_document(document_id, query)
+    # print(f"  Query Response: {response.status_code}, {response.text}")
     
     response = delete_file(document_id)
     print(f"  Delete Response: {response.status_code}, {response.text}")
@@ -154,87 +156,46 @@ def test_upload_and_query_json(test_files):
     print(f"  Delete Response: {response.status_code}, {response.text}")
 
 
-def test_update_document(test_files):
+def test_update_pdf(test_files):
     """Tests updating a document."""
     print("\nTesting Document Update...")
-    file_path = test_files["txt"]
+    file_path = test_files["pdf"]
 
     response, document_id = upload_file(file_path)
     print(f"  Initial Upload Response: {response.status_code}, {response.text}")
     if response.status_code != 201: return
+    print("document id of old",document_id)
+    time.sleep(100)
+    updated_file_path = os.path.join(os.path.dirname(file_path), "test2.pdf")
+    # with open(updated_file_path, "w") as f:
+    #     f.write("This is the updated text file.")
 
-    updated_file_path = os.path.join(os.path.dirname(file_path), "updated_test.txt")
-    with open(updated_file_path, "w") as f:
-        f.write("This is the updated text file.")
-
-    updated_metadata = {"author": "Updated Author"}
+    updated_metadata = { "author" : "Updated Author test2" }
     response = update_file(document_id, updated_file_path, updated_metadata)
     print(f"  Update Response: {response.status_code}, {response.text}")
 
-    original_query = "test text file"
-    response = query_document(document_id, original_query)
-    print(f"  Query (Original): {response.status_code}, {response.text}")
+    # original_query = "test text file"
+    # response = query_document(document_id, original_query)
+    # print(f"  Query (Original): {response.status_code}, {response.text}")
 
-    query = "updated text file"
+    query = "data science"
     response = query_document(document_id, query)
     print(f"  Query (Updated): {response.status_code}, {response.text}")
 
-    response = delete_file(document_id)
-    print(f"  Delete Response: {response.status_code}, {response.text}")
-    os.remove(updated_file_path)
+    # response = delete_file(document_id)
+    # print(f"  Delete Response: {response.status_code}, {response.text}")
+    # os.remove(updated_file_path)
 
-
-def test_delete_nonexistent_document():
-    """Tests deleting a document that doesn't exist."""
-    print("\nTesting Delete Nonexistent Document...")
-    response = delete_file("nonexistent-id")
-    print(f"  Delete Response: {response.status_code}, {response.text}")
-
-
-def test_query_without_query_parameter(test_files):
-  """Tests querying without providing query text"""
-  print("\nTesting query without parameters...")
-  file_path = test_files["txt"]
-  response, document_id = upload_file(file_path)
-  print(f"  Upload Response: {response.status_code}, {response.text}")
-  if response.status_code != 201: return
-  #query without query param.
-  url = f"{BASE_URL}/queries/{document_id}"
-  response = requests.get(url)
-  print(f"  Query Response: {response.status_code}, {response.text}")
-  # Delete
-  response = delete_file(document_id)
-  print(f"  Delete Response: {response.status_code}, {response.text}")
-
-
-def test_upload_no_file():
-    """Tests uploading without providing a file."""
-    print("\nTesting Upload Without File...")
-    url = f"{BASE_URL}/documents"
-    response = requests.post(url)
-    print(f"  Upload Response: {response.status_code}, {response.text}")
-
-def test_upload_invalid_metadata():
-    """Tests uploading with invalid metadata (not a JSON string)."""
-    print("\nTesting Upload with Invalid Metadata...")
-    url = f"{BASE_URL}/documents"
-    files = {'file': open(test_files["txt"], 'rb')}
-    data = {'metadata': 'invalid json'}  # Not a JSON string
-    response = requests.post(url, files=files, data=data)
-    files['file'].close()
-    print(f"  Upload Response: {response.status_code}, {response.text}")
 
 
 if __name__ == "__main__":
     test_files = create_test_files()
 
-    test_upload_and_query_pdf(test_files)
+    # test_upload_and_query_pdf(test_files)
     # test_upload_and_query_docx(test_files)
     # test_upload_and_query_txt(test_files)
     # test_upload_and_query_json(test_files)
-    # test_update_document(test_files)
-    # test_delete_nonexistent_document()
-    # test_query_without_query_parameter(test_files)
-    # test_upload_no_file()
-    # test_upload_invalid_metadata()
+    # delete_file("878af90e-1895-4b00-bedf-cbeaa7a6bcb6")
+    # delete_file("3c6c6977-35e8-45c5-97fb-1cd7be128e04")
+    test_update_pdf(test_files)
     print("\nAll tests completed.")

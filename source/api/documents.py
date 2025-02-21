@@ -60,13 +60,14 @@ def register_routes(app): #wrapper function.
         if file:
             filename = secure_filename(file.filename)
             content_type = file.content_type
+            if content_type == None:content_type="application/pdf"
             metadata = request.form.get('metadata')
             if metadata:
                 try:
                     metadata = json.loads(metadata)
                 except json.JSONDecodeError:
                     return jsonify({'error': "Invalid metadata format, must be valid JSON"}), 400
-
+                
             upload_folder = current_app.config['UPLOAD_FOLDER']
             os.makedirs(upload_folder, exist_ok=True)
             file_path = os.path.join(upload_folder, filename)
