@@ -12,7 +12,7 @@ class EmbeddingService:
             
             self.client=client
             
-            
+        print("embedder initialised")
         # else:
         #     self.hf_model = SentenceTransformer(model_name)
             

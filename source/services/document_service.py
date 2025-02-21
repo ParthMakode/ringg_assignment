@@ -1,4 +1,4 @@
-import uuid
+import uuid,time
 from source.utils.file_utils import read_and_parse_file
 from source.services.embedding_service import EmbeddingService
 from source.services.weaviate_service import WeaviateService
@@ -21,21 +21,25 @@ class DocumentService:
     def process_and_index_document(self, file_path: str, file_name:str, content_type: str, metadata: dict = None) -> str:
         """Reads, parses, chunks, embeds, and indexes a document."""
         try:
+            print("file path ",file_path)
             file_content = read_and_parse_file(file_path, content_type)
         except Exception as e:
             raise ValueError(f"Error Processing file: {e}")
 
         # Generate a unique ID for the document
         document_id = str(uuid.uuid4())
+        print("id generated")
         document = Document(id=document_id, filename=file_name, content=file_content, content_type=content_type, metadata=metadata or {})
-
+        print("chunking")
         if content_type != "application/json": # Chunk all except json.
             chunks = self.text_splitter.split_text(file_content)
             document.content = chunks
         else:
-            chunks = [file_content] #dont chunk.
-
+            chunks = [file_content]
+            document.content=chunks#dont chunk.
+        print("chunking done")
         embeddings = [self.embedding_service.generate_embedding(chunk) for chunk in chunks]
+        print("reached before weaviate call")
         self.weaviate_service.index_document(document, embeddings)
         return document_id
 

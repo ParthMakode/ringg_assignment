@@ -1,24 +1,25 @@
-from flask import Blueprint, request, jsonify, current_app
-from ..services.document_service import DocumentService
-from ..services.weaviate_service import WeaviateService
-from ..services.embedding_service import EmbeddingService
-from ..utils.config import Config
+from flask import request, jsonify, current_app
+from source.services.document_service import DocumentService
+from source.services.weaviate_service import WeaviateService
+from source.services.embedding_service import EmbeddingService
+from source.utils.config import Config
 
-queries_bp = Blueprint('queries', __name__, url_prefix='/queries')
+# No Blueprint needed
 
-@queries_bp.route('/<document_id>', methods=['GET'])
-def query_document_route(document_id):
-    query_text = request.args.get('query')
-    if not query_text:
-        return jsonify({'error': 'Missing query parameter'}), 400
-    
-    config = Config()
-    embedding_service = EmbeddingService(use_openai=False, model_name= config.HUGGINGFACE_MODEL_NAME)  # Or True for OpenAI
-    weaviate_service = WeaviateService(config)
-    document_service = DocumentService(embedding_service, weaviate_service, config)
+def register_routes(app):
+    @app.route('/queries/<document_id>', methods=['GET'])
+    def query_document_route(document_id):
+        query_text = request.args.get('query')
+        if not query_text:
+            return jsonify({'error': 'Missing query parameter'}), 400
 
-    try:
-        results = document_service.query_document(document_id, query_text)
-        return jsonify([r.__dict__ for r in results]), 200  # Convert dataclass to dict
-    except Exception as e:
+        config = Config()
+        embedding_service = EmbeddingService(use_gemini=True, model_name=config.HUGGINGFACE_MODEL_NAME)
+        weaviate_service = WeaviateService(config)
+        document_service = DocumentService(embedding_service, weaviate_service, config)
+
+        try:
+            results = document_service.query_document(document_id, query_text)
+            return jsonify([r.__dict__ for r in results]), 200
+        except Exception as e:
             return jsonify({'error': str(e)}), 500

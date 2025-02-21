@@ -3,11 +3,13 @@ import json
 
 def read_and_parse_file(file_path: str, content_type: str) -> str:
     """Reads and parses a file based on its content type."""
-    md = MarkItDown(enable_plugins=False)
+    md = MarkItDown()
     try:
         if content_type == "application/pdf":
+            print("got pdf")
             result = md.convert(file_path)
-            print(result.text_content)
+            # print("document ",result.text_content)
+        
             return result.text_content
         elif content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
             result =md.convert(file_path)
