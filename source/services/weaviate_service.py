@@ -91,7 +91,7 @@ class WeaviateService:
         collection = self.client.collections.get(self.class_name)
         print("got collection")
         response=[]
-        if(document_id!=""):
+        if(document_id != ""):
             response = collection.query.near_vector(
                 near_vector=query_embedding,
                 distance=0.45,
@@ -100,7 +100,7 @@ class WeaviateService:
                 # certainty=0.5,
                 filters=Filter.by_property("original_document_id").equal(document_id),
                 return_properties=["filename", "content_chunk", "chunk_sort_key", "original_document_id"]
-        )
+            )
         else:
             response = collection.query.near_vector(
                 near_vector=query_embedding,
@@ -124,6 +124,16 @@ class WeaviateService:
             ))
         print(len(results))
         return results
+    # def exist_check_by_filename(self,filename:str=None)->bool:
+    #     if(not filename):
+    #         return True
+    #     else:
+    #         collection = self.client.collections.get(self.class_name)
+    #         collection.data.delete_many(
+    #         where=Filter.by_property("filename").equal(filename))
+    #         return False
+        
+            
 
     def delete_document(self, document_id: str):
         """Delete all chunks associated with a document"""
@@ -131,6 +141,7 @@ class WeaviateService:
         collection.data.delete_many(
             where=Filter.by_property("original_document_id").equal(document_id)
         )
+        return document_id
 
     def close(self):
         """Close the client connection"""

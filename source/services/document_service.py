@@ -50,14 +50,14 @@ class DocumentService:
 
     def update_document(self, document_id: str, file_path: str, file_name:str, content_type: str, metadata: dict = None) -> str:
         """Deletes the old document and indexes the new one."""
-        self.delete_document(document_id)
+        old_id=self.delete_document(document_id)
         print("deleted document id ",document_id,"\nrenewing new document with ",document_id,"\n",file_path)
-        return self.process_and_index_document(file_path, file_name, content_type, metadata,oldid=document_id)
+        return self.process_and_index_document(file_path, file_name, content_type, metadata,oldid=old_id)
 
 
     def delete_document(self, document_id: str):
         """Deletes a document from Weaviate."""
-        self.weaviate_service.delete_document(document_id)
+        return self.weaviate_service.delete_document(document_id)
 
     def query_document(self, document_id: str, query_text: str) -> list:
         """Generates an embedding for the query and queries Weaviate."""

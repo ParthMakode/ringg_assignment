@@ -11,5 +11,5 @@ class Config:
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', 'data/uploads')
     LLAMA_PARSE_API=os.environ.get('LLAMA_CLOUD_API_KEY')
     # Add other configurations as needed (e.g., chunk size, overlap)
-    CHUNK_SIZE = 500
+    CHUNK_SIZE = 1000
     CHUNK_OVERLAP = 10

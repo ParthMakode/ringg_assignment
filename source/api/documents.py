@@ -7,7 +7,6 @@ from source.services.weaviate_service import WeaviateService
 from source.services.embedding_service import EmbeddingService
 from source.utils.config import Config
 
-# No Blueprint needed
 
 def register_routes(app): #wrapper function.
 
@@ -21,7 +20,8 @@ def register_routes(app): #wrapper function.
             return jsonify({'error': 'No selected file'}), 400
         if file:
             filename = secure_filename(file.filename)
-            content_type = file.content_type  # Correct way to get content type
+            content_type = request.form.get('content_type')
+            print("CONTENt ",content_type )
             metadata = request.form.get('metadata')
             if metadata:
                 try:
@@ -41,7 +41,7 @@ def register_routes(app): #wrapper function.
             document_service = DocumentService(embedding_service, weaviate_service, config)
 
             try:
-                document_id = document_service.process_and_index_document(file_path, filename, content_type="application/pdf", metadata=metadata)
+                document_id = document_service.process_and_index_document(file_path, filename, content_type=content_type, metadata=metadata)
                 return jsonify({'message': 'Document uploaded and processed', 'document_id': document_id}), 201
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
@@ -59,8 +59,8 @@ def register_routes(app): #wrapper function.
 
         if file:
             filename = secure_filename(file.filename)
-            content_type = file.content_type
-            if content_type == None:content_type="application/pdf"
+            content_type = request.form.get('content_type')
+            print("CONTENt ",content_type )
             metadata = request.form.get('metadata')
             if metadata:
                 try:

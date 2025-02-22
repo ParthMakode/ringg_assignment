@@ -11,8 +11,8 @@ BASE_URL = "http://127.0.0.1:5000"
 def upload_file(file_path, metadata=None):
     """Uploads a file and returns the response and document ID."""
     url = f"{BASE_URL}/documents"
-    files = {'file': open(file_path, 'rb'),'content_type':'application/pdf'}
-    data = {}
+    files = {'file': open(file_path, 'rb')}
+    data = {'content_type': 'application/pdf'}
     if metadata:
         data['metadata'] = json.dumps(metadata)  # Ensure metadata is a JSON string
     response = requests.post(url, files=files, data=data)
@@ -22,11 +22,11 @@ def upload_file(file_path, metadata=None):
     else:
         return response, None
 
-def update_file(document_id, file_path, metadata=None):
+def update_pdf_file(document_id, file_path, metadata=None):
     """Updates a file and returns the response."""
     url = f"{BASE_URL}/documents/{document_id}"
     files = {'file': open(file_path, 'rb')}
-    data = {}
+    data = {'content_type': 'application/pdf'}
     if metadata:
         data['metadata'] = json.dumps(metadata)
     response = requests.put(url, files=files, data=data)
@@ -165,13 +165,13 @@ def test_update_pdf(test_files):
     print(f"  Initial Upload Response: {response.status_code}, {response.text}")
     if response.status_code != 201: return
     print("document id of old",document_id)
-    time.sleep(100)
+    time.sleep(30)
     updated_file_path = os.path.join(os.path.dirname(file_path), "test2.pdf")
     # with open(updated_file_path, "w") as f:
     #     f.write("This is the updated text file.")
 
     updated_metadata = { "author" : "Updated Author test2" }
-    response = update_file(document_id, updated_file_path, updated_metadata)
+    response = update_pdf_file(document_id, updated_file_path, updated_metadata)
     print(f"  Update Response: {response.status_code}, {response.text}")
 
     # original_query = "test text file"
@@ -195,7 +195,6 @@ if __name__ == "__main__":
     # test_upload_and_query_docx(test_files)
     # test_upload_and_query_txt(test_files)
     # test_upload_and_query_json(test_files)
-    # delete_file("878af90e-1895-4b00-bedf-cbeaa7a6bcb6")
-    # delete_file("3c6c6977-35e8-45c5-97fb-1cd7be128e04")
+
     test_update_pdf(test_files)
     print("\nAll tests completed.")
