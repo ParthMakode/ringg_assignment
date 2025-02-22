@@ -7,21 +7,27 @@ from source.services.weaviate_service import WeaviateService
 from source.services.embedding_service import EmbeddingService
 from source.utils.config import Config
 
-
-def register_routes(app): #wrapper function.
+def register_routes(app):
 
     @app.route('/documents', methods=['POST'])
-    def upload_document():
-        if 'file' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
-        file = request.files['file']
+    def handle_document():
+        """Handles document upload, update, and deletion via a single POST endpoint."""
 
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-        if file:
+        # Determine the action (upload, update, delete)
+        action = request.form.get('action')
+        document_id = request.form.get('document_id')  # Get document_id from form data
+
+        if action == 'upload':
+            # --- Upload Logic ---
+            if 'file' not in request.files:
+                return jsonify({'error': 'No file part'}), 400
+            file = request.files['file']
+
+            if file.filename == '':
+                return jsonify({'error': 'No selected file'}), 400
+
             filename = secure_filename(file.filename)
-            content_type = request.form.get('content_type')
-            print("CONTENt ",content_type )
+            content_type = request.form.get('content_type')  # Get from form data
             metadata = request.form.get('metadata')
             if metadata:
                 try:
@@ -33,41 +39,40 @@ def register_routes(app): #wrapper function.
             os.makedirs(upload_folder, exist_ok=True)
             file_path = os.path.join(upload_folder, filename)
             file.save(file_path)
-            print("configing")
-            
+
             config = Config()
             embedding_service = EmbeddingService(use_gemini=True, model_name=config.HUGGINGFACE_MODEL_NAME)
             weaviate_service = WeaviateService(config)
             document_service = DocumentService(embedding_service, weaviate_service, config)
 
             try:
-                document_id = document_service.process_and_index_document(file_path, filename, content_type=content_type, metadata=metadata)
+                document_id = document_service.process_and_index_document(file_path, filename, content_type, metadata)
                 return jsonify({'message': 'Document uploaded and processed', 'document_id': document_id}), 201
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
             finally:
                 os.remove(file_path)
 
+        elif action == 'update':
+            # --- Update Logic ---
+            if not document_id:
+                return jsonify({'error': 'Missing document_id for update'}), 400
+            if 'file' not in request.files:
+                return jsonify({'error': 'No file part'}), 400
+            file = request.files['file']
 
-    @app.route('/documents/<document_id>', methods=['PUT'])
-    def update_document_route(document_id):
-        if 'file' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
+            if file.filename == '':
+                return jsonify({'error': 'No selected file'}), 400
 
-        if file:
             filename = secure_filename(file.filename)
-            content_type = request.form.get('content_type')
-            print("CONTENt ",content_type )
+            content_type = request.form.get('content_type') # Get from form data
             metadata = request.form.get('metadata')
             if metadata:
                 try:
                     metadata = json.loads(metadata)
                 except json.JSONDecodeError:
                     return jsonify({'error': "Invalid metadata format, must be valid JSON"}), 400
-                
+
             upload_folder = current_app.config['UPLOAD_FOLDER']
             os.makedirs(upload_folder, exist_ok=True)
             file_path = os.path.join(upload_folder, filename)
@@ -85,17 +90,21 @@ def register_routes(app): #wrapper function.
                 return jsonify({'error': str(e)}), 500
             finally:
                 os.remove(file_path)
+        elif action == 'delete':
+            # --- Delete Logic ---
+            if not document_id:
+                return jsonify({'error': 'Missing document_id for delete'}), 400
 
+            config = Config()
+            embedding_service = EmbeddingService(use_gemini=True, model_name=config.HUGGINGFACE_MODEL_NAME)
+            weaviate_service = WeaviateService(config)
+            document_service = DocumentService(embedding_service, weaviate_service, config)
 
-    @app.route('/documents/<document_id>', methods=['DELETE'])
-    def delete_document_route(document_id):
-        config = Config()
-        embedding_service = EmbeddingService(use_gemini=True, model_name=config.HUGGINGFACE_MODEL_NAME)
-        weaviate_service = WeaviateService(config)
-        document_service = DocumentService(embedding_service, weaviate_service, config)
+            try:
+                document_service.delete_document(document_id)
+                return jsonify({'message': f'Document with id {document_id} deleted'}), 200
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
 
-        try:
-            document_service.delete_document(document_id)
-            return jsonify({'message': f'Document with id {document_id} deleted'}), 200
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
+        else:
+            return jsonify({'error': 'Invalid action specified'}), 400

@@ -26,7 +26,9 @@ def read_and_parse_file(file_path: str, content_type: str) -> str:
             documents = SimpleDirectoryReader(input_files=[file_path], file_extractor=file_extractor).load_data()
             
             # return result.text_content
-            return documents[0].text_resource.text
+            print("\n".join([word.text_resource.text for word in documents]))
+            
+            return "\n".join([word.text_resource.text for word in documents])
         elif content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
             pass
             # result =md.convert(file_path)
