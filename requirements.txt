@@ -1,7 +1,8 @@
 python-dotenv
 flask
 google_genai
-weaviate>=4.11.0
+weaviate-client>=4.11.0
+weaviate=>0.1.2
 # sentence-transformers
 llama-cloud-services
 llama-index-core
