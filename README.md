@@ -115,6 +115,8 @@ This endpoint handles document queries.
 *   `400 Bad Request`:  Missing `document_id` or `query`.
 *   `500 Internal Server Error`:  Error during query processing.
 
+
+
 ## Setup and Installation
 
 1.  **Clone the repository:**
@@ -169,6 +171,115 @@ This endpoint handles document queries.
     python scripts/monitor_uploads.py
     ```
     This script will monitor the `data/uploads` directory and automatically process any new or modified files.
+
+## API Usage with `curl`
+
+This section provides examples of how to interact with the API using the `curl` command-line tool. Pay close attention to file paths and your current working directory.
+
+### Important Notes:
+
+- **Current Working Directory:** When using `curl` with `@` to upload files, the path to the file is *relative to your current working directory*. Make sure you are in the correct directory or use absolute paths for the files. I'll show examples of both.
+- **Windows vs. Linux/macOS:** File paths use backslashes (`\`) on Windows and forward slashes (`/`) on Linux/macOS. The examples below use forward slashes, consistent with the rest of your project (and generally preferred even on Windows for cross-platform compatibility). Adapt as needed.
+- **JSON Formatting:** When sending JSON data, ensure it's properly formatted. You can use online JSON validators to check. Use `-H "Content-Type: application/json"` for JSON requests.
+- **`localhost` vs. `127.0.0.1`:** These are generally interchangeable. I'll use `127.0.0.1` to match your `monitor_uploads.py` script.
+- **Quotes:** For string values with spaces, use quotes.
+
+---
+
+### 1. Upload a Document (`action=upload`)
+
+**Scenario:** You have a file named `my_document.pdf` in a directory `documents` which is in the same directory as your `app.py` file.
+
+#### Method 1: Relative Path (assuming you're in the project root)
+
+```bash
+curl -X POST -F "action=upload" -F "file=@documents/my_document.pdf" -F "content_type=application/pdf" -F 'metadata={"author": "John Doe", "date": "2024-10-27"}' http://127.0.0.1:5000/documents
+```
+
+#### Method 2: Absolute Path (works from anywhere)
+
+```bash
+curl -X POST -F "action=upload" -F "file=@/path/to/your/project/documents/my_document.pdf" -F "content_type=application/pdf" -F 'metadata={"author": "John Doe", "date": "2024-10-27"}' http://127.0.0.1:5000/documents
+```
+
+### Explanation:
+
+- `-X POST`: Specifies the HTTP method (POST).
+- `-F`: Specifies form data (used for file uploads and other parameters).
+- `file=@documents/my_document.pdf`: Uploads the file. `@` tells `curl` to read the file. The path is relative to your current working directory.
+- `content_type=application/pdf`: Sets the content type. Change this as needed (e.g., `text/plain`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, `application/json`).
+- `metadata={"author":...}`: Sends optional metadata as a JSON string.
+- `http://127.0.0.1:5000/documents`: The API endpoint.
+
+#### Example with a Text File (`my_document.txt`) and You're in a Different Directory:
+
+Let's say you're in your home directory (`~`) and the project is in `~/projects/my_project`.
+
+```bash
+# From your home directory (~):
+curl -X POST -F "action=upload" -F "file=@projects/my_project/documents/my_document.txt" -F "content_type=text/plain" http://127.0.0.1:5000/documents
+```
+
+---
+
+### 2. Update a Document (`action=update`)
+
+**Scenario:** You want to update the document with `document_id="123-abc"` with a new file `updated_document.docx`.
+
+```bash
+curl -X POST -F "action=update" -F "document_id=123-abc" -F "file=@documents/updated_document.docx" -F "content_type=application/vnd.openxmlformats-officedocument.wordprocessingml.document" http://127.0.0.1:5000/documents
+```
+
+- `document_id=123-abc`: The ID of the document to update. This is crucial for updates.
+
+---
+
+### 3. Delete a Document (`action=delete`)
+
+**Scenario:** You want to delete the document with `document_id="123-abc"`.
+
+```bash
+curl -X POST -F "action=delete" -F "document_id=123-abc" http://127.0.0.1:5000/documents
+```
+
+---
+
+### 4. Query a Document
+
+**Scenario:** You want to query the document with `document_id="123-abc"` for the text "search term". You want 3 chunks returned.
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"document_id": "123-abc", "query": "search term", "num_chunks_return": 3}' http://127.0.0.1:5000/queries
+```
+
+- `-H "Content-Type: application/json"`: Indicates that you're sending JSON data.
+- `-d '{"document_id": "123-abc", "query": "search term"}'`: Sends the query parameters as a JSON object. This is different from file uploads.
+
+#### Example Query with Spaces in the Search Term:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"document_id": "123-abc", "query": "my search term with spaces"}' http://127.0.0.1:5000/queries
+```
+
+#### Example to Get Results for All Documents:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"document_id": "", "query": "search term"}' http://127.0.0.1:5000/queries
+```
+
+---
+
+### 5. Uploading a JSON File
+
+```bash
+curl -X POST -F "action=upload" -F "file=@data/my_data.json" -F "content_type=application/json" http://127.0.0.1:5000/documents
+```
+
+Make sure `data/my_data.json` is a valid JSON file.
+
+---
+
+These examples cover the main API interactions and demonstrate how to handle file paths correctly. Remember to adjust the paths, document IDs, content types, and query text to match your specific needs. Always double-check your current working directory when using relative paths.
 
 
 ## Improvements and TODOs
