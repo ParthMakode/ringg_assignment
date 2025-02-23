@@ -4,6 +4,7 @@ google_genai
 weaviate-client>=4.11.0
 # weaviate=>0.1.2
 # sentence-transformers
+langchain_text_splitters
 llama-cloud-services
 llama-index-core
 llama-index-readers-file
