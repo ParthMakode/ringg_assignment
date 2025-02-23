@@ -33,3 +33,6 @@ def register_routes(app):
             return jsonify([r.__dict__ for r in results]), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+    @app.route('/')
+    def health_check():
+        return jsonify({'status': 'alive'}), 200
