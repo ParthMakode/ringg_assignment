@@ -1,5 +1,4 @@
 import weaviate
-import weaviate.classes as wvc
 from weaviate import WeaviateClient
 from weaviate.classes.config import Configure, Property, DataType
 from weaviate.classes.query import Filter,MetadataQuery
