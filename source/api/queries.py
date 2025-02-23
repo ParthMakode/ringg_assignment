@@ -7,6 +7,7 @@ from source.utils.config import Config
 def register_routes(app):
     @app.route('/queries', methods=['POST'])  # Changed to POST
     def query_document_route():
+        print("calling query route")
         # Get document_id and query_text from the request body (JSON)
         data = request.get_json()
 
@@ -15,7 +16,7 @@ def register_routes(app):
 
         document_id = data.get('document_id')
         query_text = data.get('query')
-
+        limit=data.get('num_chunks_return')
         if not document_id:
             return jsonify({'error': 'Missing document_id'}), 400
         if not query_text:
@@ -27,7 +28,8 @@ def register_routes(app):
         document_service = DocumentService(embedding_service, weaviate_service, config)
 
         try:
-            results = document_service.query_document(document_id, query_text)
+            results = document_service.query_document(document_id, query_text,limit)
+            weaviate_service.close()
             return jsonify([r.__dict__ for r in results]), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500

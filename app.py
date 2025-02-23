@@ -21,3 +21,10 @@ if __name__ == '__main__':
     debug = os.getenv('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
 
     app.run(host=host, port=port, debug=debug)
+    
+    
+    
+    
+    
+    # TODO : implement json , better chunking for file types, argument for top ten results
+    
