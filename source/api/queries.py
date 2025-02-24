@@ -14,7 +14,7 @@ def register_routes(app):
         if not data:
             return jsonify({'error': 'Missing request body'}), 400
 
-        document_id = data.get('document_id')
+        document_id = data.get('document_id',"")
         query_text = data.get('query')
         limit=data.get('num_chunks_return')
         if not document_id:

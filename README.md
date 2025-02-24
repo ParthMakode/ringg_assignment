@@ -193,13 +193,13 @@ This section provides examples of how to interact with the API using the `curl` 
 #### Method 1: Relative Path (assuming you're in the project root)
 
 ```bash
-curl -X POST -F "action=upload" -F "file=@documents/my_document.pdf" -F "content_type=application/pdf" -F 'metadata={"author": "John Doe", "date": "2024-10-27"}' http://127.0.0.1:5000/documents
+curl -X POST -F "action=upload" -F "file=@documents/my_document.pdf" -F "content_type=application/pdf" -F 'metadata={"author": "John Doe", "date": "2024-10-27"}' https://ringg-assignment.onrender.com/documents
 ```
 
 #### Method 2: Absolute Path (works from anywhere)
 
 ```bash
-curl -X POST -F "action=upload" -F "file=@/path/to/your/project/documents/my_document.pdf" -F "content_type=application/pdf" -F 'metadata={"author": "John Doe", "date": "2024-10-27"}' http://127.0.0.1:5000/documents
+curl -X POST -F "action=upload" -F "file=@/path/to/your/project/documents/my_document.pdf" -F "content_type=application/pdf" -F 'metadata={"author": "John Doe", "date": "2024-10-27"}' https://ringg-assignment.onrender.com/documents
 ```
 
 ### Explanation:
@@ -217,7 +217,7 @@ Let's say you're in your home directory (`~`) and the project is in `~/projects/
 
 ```bash
 # From your home directory (~):
-curl -X POST -F "action=upload" -F "file=@projects/my_project/documents/my_document.txt" -F "content_type=text/plain" http://127.0.0.1:5000/documents
+curl -X POST -F "action=upload" -F "file=@projects/my_project/documents/my_document.txt" -F "content_type=text/plain" https://ringg-assignment.onrender.com/documents
 ```
 
 ---
@@ -227,7 +227,7 @@ curl -X POST -F "action=upload" -F "file=@projects/my_project/documents/my_docum
 **Scenario:** You want to update the document with `document_id="123-abc"` with a new file `updated_document.docx`.
 
 ```bash
-curl -X POST -F "action=update" -F "document_id=123-abc" -F "file=@documents/updated_document.docx" -F "content_type=application/vnd.openxmlformats-officedocument.wordprocessingml.document" http://127.0.0.1:5000/documents
+curl -X POST -F "action=update" -F "document_id=123-abc" -F "file=@documents/updated_document.docx" -F "content_type=application/vnd.openxmlformats-officedocument.wordprocessingml.document" https://ringg-assignment.onrender.com/documents
 ```
 
 - `document_id=123-abc`: The ID of the document to update. This is crucial for updates.
@@ -239,7 +239,7 @@ curl -X POST -F "action=update" -F "document_id=123-abc" -F "file=@documents/upd
 **Scenario:** You want to delete the document with `document_id="123-abc"`.
 
 ```bash
-curl -X POST -F "action=delete" -F "document_id=123-abc" http://127.0.0.1:5000/documents
+curl -X POST -F "action=delete" -F "document_id=123-abc" https://ringg-assignment.onrender.com/documents
 ```
 
 ---
@@ -249,7 +249,7 @@ curl -X POST -F "action=delete" -F "document_id=123-abc" http://127.0.0.1:5000/d
 **Scenario:** You want to query the document with `document_id="123-abc"` for the text "search term". You want 3 chunks returned.
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"document_id": "123-abc", "query": "search term", "num_chunks_return": 3}' http://127.0.0.1:5000/queries
+curl -X POST -H "Content-Type: application/json" -d '{"document_id": "123-abc", "query": "search term", "num_chunks_return": 3}' https://ringg-assignment.onrender.com/queries
 ```
 
 - `-H "Content-Type: application/json"`: Indicates that you're sending JSON data.
@@ -258,13 +258,13 @@ curl -X POST -H "Content-Type: application/json" -d '{"document_id": "123-abc", 
 #### Example Query with Spaces in the Search Term:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"document_id": "123-abc", "query": "my search term with spaces"}' http://127.0.0.1:5000/queries
+curl -X POST -H "Content-Type: application/json" -d '{"document_id": "123-abc", "query": "my search term with spaces"}' https://ringg-assignment.onrender.com/queries
 ```
 
 #### Example to Get Results for All Documents:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"document_id": "", "query": "search term"}' http://127.0.0.1:5000/queries
+curl -X POST -H "Content-Type: application/json" -d '{"document_id": "", "query": "search term"}' https://ringg-assignment.onrender.com/queries
 ```
 
 ---
@@ -272,7 +272,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"document_id": "", "query"
 ### 5. Uploading a JSON File
 
 ```bash
-curl -X POST -F "action=upload" -F "file=@data/my_data.json" -F "content_type=application/json" http://127.0.0.1:5000/documents
+curl -X POST -F "action=upload" -F "file=@data/my_data.json" -F "content_type=application/json" https://ringg-assignment.onrender.com/documents
 ```
 
 Make sure `data/my_data.json` is a valid JSON file.
