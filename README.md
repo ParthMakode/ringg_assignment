@@ -174,7 +174,7 @@ This endpoint handles document queries.
 
 ## API Usage with `curl`
 
-This section provides examples of how to interact with the API using the `curl` command-line tool. Pay close attention to file paths and your current working directory.
+This section provides examples of how to interact with the API using the `curl` command-line tool. Pay close attention to file paths and your current working directory. The current render deployed link is being used in this section .
 
 ### Important Notes:
 
@@ -286,5 +286,6 @@ These examples cover the main API interactions and demonstrate how to handle fil
 
 *   **Error Handling:** Improve error handling throughout the application, especially in API endpoints and the `monitor_uploads.py` script. Provide more informative error messages to the user.
 *   **JSON Chunking:** Tried to implement more sophisticated chunking for JSON files, potentially using a recursive approach and tracking hierarchy.  Currently it treats the whole JSON as a single chunk.Also I was confused about how the input json and queries would look like in the case of query and upload and what the objective was .
+*  **Rate_Limits:** For creating embeddings the gemini is free but it is rate limited so errors for more than 
 
 
